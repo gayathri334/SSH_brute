@@ -1,0 +1,209 @@
+<form version="1.1" theme="dark">
+  <label>SSH Brute-Force Security Dashboard</label>
+  <description>Real-time security operations dashboard for SSH brute-force and credential stuffing analysis</description>
+  
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="global_time">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <!-- PANEL 1: Attack Overview Single Value Tiles -->
+  <row>
+    <panel>
+      <title>Total Failed Attempts</title>
+      <single>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure status=failure | stats count</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[10,100]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    
+    <panel>
+      <title>Unique Attacking IPs</title>
+      <single>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure status=failure | stats dc(src_ip)</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[2,5]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+
+    <panel>
+      <title>Accounts Targeted</title>
+      <single>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure status=failure | stats dc(username)</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[3,10]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+
+    <panel>
+      <title>Successful Logins After Failures</title>
+      <single>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure (status=failure OR status=success) | transaction src_ip maxspan=10m | search status=failure AND status=success | eval fail_count=mvcount(mvfilter(status=="failure")) | where fail_count &gt;= 5 | stats count</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- PANEL 2: Attack Timeline (Line Chart) -->
+  <row>
+    <panel>
+      <title>Attack Timeline (Last 6 Hours)</title>
+      <chart>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure earliest=-6h | timechart span=5m count(eval(status="failure")) as "Failed Logins", count(eval(status="success")) as "Successful Logins"</query>
+          <earliest>-6h</earliest>
+          <latest>now</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.seriesColors">[0xdc4e41,0x53a051]</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- PANEL 3 & PANEL 4: Top Attacking IPs & Targeted Accounts -->
+  <row>
+    <panel>
+      <title>Top 10 Attacking IPs (Bar Chart)</title>
+      <chart>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure status=failure | stats count by src_ip | sort - count | head 10</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">[0xdc4e41]</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+    
+    <panel>
+      <title>Targeted Accounts (Pie Chart)</title>
+      <chart>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure status=failure | stats count by username | sort - count</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- PANEL 5: Geographic Attack Map -->
+  <row>
+    <panel>
+      <title>Geographic Attack Map</title>
+      <map>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure status=failure | iplocation src_ip | geostats count by Country</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.type">marker</option>
+        <option name="drilldown">none</option>
+      </map>
+    </panel>
+  </row>
+
+  <!-- PANEL 6: Live Attack Feed -->
+  <row>
+    <panel>
+      <title>Live Attack Feed (Last 15 Minutes)</title>
+      <table>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure | iplocation src_ip | eval time=strftime(_time, "%Y-%m-%d %H:%M:%S") | fillnull value="Local/Unknown" Country | table time, src_ip, username, status, Country | sort - time</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- PANEL 7: Credential Stuffing Alerts -->
+  <row>
+    <panel>
+      <title>Credential Stuffing Alerts (Failures followed by Success)</title>
+      <table>
+        <search>
+          <query>index=ssh_security sourcetype=linux_secure (status=failure OR status=success) | transaction src_ip maxspan=10m | search status=failure AND status=success | eval fail_count=mvcount(mvfilter(status=="failure")) | where fail_count &gt;= 5 | eval success_time=strftime(max(eval(if(status=="success", _time, null))), "%Y-%m-%d %H:%M:%S") | table src_ip, fail_count, success_time, username | sort - success_time</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <refresh>60s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>
