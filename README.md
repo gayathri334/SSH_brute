@@ -1,4 +1,5 @@
 SSH Brute-Force Detection in Splunk
+
 📌 Project Overview
 
 This project demonstrates how to simulate SSH brute-force attacks in a controlled lab environment and detect them using Splunk. The solution collects SSH authentication logs from a Linux server, analyzes failed and successful login attempts, and generates threshold-based alerts to identify credential abuse patterns.
@@ -13,6 +14,7 @@ Create dashboards for login monitoring.
 Build threshold-based detection rules.
 Generate alerts for suspicious login activity.
 Visualize attack trends and attacker IP addresses.
+
 🛠 Technologies Used
 Tool	Purpose
 Kali Linux	Attack machine
@@ -21,6 +23,7 @@ Nmap	Host discovery and port scanning
 Splunk Enterprise	Log analysis and SIEM
 Ubuntu/Linux Server	Target system
 auth.log	Authentication log source
+
 🏗 Architecture
 +----------------+
 | Kali Linux     |
@@ -46,6 +49,7 @@ auth.log	Authentication log source
 | Dashboards     |
 | Alerts         |
 +----------------+
+
 🔧 Lab Setup
 Attacker Machine
 Kali Linux
@@ -57,6 +61,7 @@ OpenSSH Service Enabled
 Monitoring Machine
 Splunk Enterprise
 Splunk Universal Forwarder
+
 📂 Log Source
 
 Linux authentication logs:
@@ -97,6 +102,7 @@ set USER_FILE users.txt
 set PASS_FILE passwords.txt
 set VERBOSE true
 run
+
 📥 Splunk Log Ingestion
 Monitor auth.log
 Settings → Data Inputs → Files & Directories
@@ -211,7 +217,7 @@ Your Name
 
 Role: Cybersecurity Analyst / SOC Analyst
 Skills: Splunk, SIEM, Threat Detection, Log Analysis, Linux Security
-GitHub: https://github.com/yourusername
+GitHub: https://github.com/Gayathri334
 ⭐ Future Enhancements
 Integrate GeoIP Enrichment
 Add Risk-Based Alerting
