@@ -25,6 +25,7 @@ Ubuntu/Linux Server	Target system
 auth.log	Authentication log source
 
 🏗 Architecture
+
 +----------------+
 | Kali Linux     |
 | (Attacker)     |
@@ -118,6 +119,7 @@ linux_secure
 Index:
 
 security
+
 🔍 Splunk Detection Queries
 Failed SSH Login Attempts
 index=security sourcetype=linux_secure
@@ -142,6 +144,7 @@ index=security sourcetype=linux_secure
 | bucket _time span=5m
 | stats count by src,_time
 | where count > 10
+
 📊 Dashboard Components
 SSH Security Dashboard
 Panels
@@ -152,6 +155,7 @@ Failed Login Trend
 Successful Login Trend
 SSH Login Heatmap
 Geographic Source Analysis (Optional)
+
 🚨 Alert Configuration
 Alert Name
 SSH Brute Force Detection
@@ -182,6 +186,7 @@ Password spraying attacks.
 Suspicious attacker IP addresses.
 Successful logins following multiple failures.
 Attack timelines and trends.
+
 🔐 Security Use Cases
 Brute-Force Attack Detection
 Credential Abuse Monitoring
@@ -189,6 +194,7 @@ Insider Threat Monitoring
 Unauthorized Access Detection
 SSH Activity Auditing
 Security Operations Center (SOC) Monitoring
+
 📸 Sample Screenshots
 screenshots/
 ├── dashboard.png
@@ -213,7 +219,7 @@ This project is intended strictly for educational and authorized cybersecurity l
 
 👨‍💻 Author
 
-Your Name
+Gayathri.M
 
 Role: Cybersecurity Analyst / SOC Analyst
 Skills: Splunk, SIEM, Threat Detection, Log Analysis, Linux Security
